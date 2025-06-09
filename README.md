@@ -1,5 +1,8 @@
 # Auction Smart Contract
 
+Contract Address: `0x3Fd83C0381e4200DF46a8549F250a19D42cb6fAE`
+Verified at: [Sepolia Etherscan](https://sepolia.etherscan.io/address/0x3Fd83C0381e4200DF46a8549F250a19D42cb6fAE)
+
 A simple auction smart contract that implements basic auction functionality with automatic time extension.
 
 ## Features
