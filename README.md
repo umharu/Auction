@@ -1,101 +1,93 @@
-# Auction Smart Contract
+# Smart Contract Auction System
 
-Contract Address: `0x3Fd83C0381e4200DF46a8549F250a19D42cb6fAE`
-Verified at: [Sepolia Etherscan](https://sepolia.etherscan.io/address/0x3Fd83C0381e4200DF46a8549F250a19D42cb6fAE)
-
-A simple auction smart contract that implements basic auction functionality with automatic time extension.
+A secure and efficient auction system implemented as a Solidity smart contract. This system provides a transparent and automated way to conduct auctions with automatic time extensions and bid management.
 
 ## Features
 
-- Place bids with 5% minimum increase requirement
-- Automatic 10-minute extension for bids in last 10 minutes
-- 2% fee on winning bid
-- Refund system for non-winning bidders
+- **Automatic Time Extension**: Auctions automatically extend by 10 minutes if a bid is placed in the last 10 minutes
+- **Minimum Bid Increase**: Requires bids to be at least 5% higher than the current highest bid
+- **Fee System**: Implements a 2% fee on winning bids
+- **Bid Management**:
+  - Partial withdrawal capability for excess funds
+  - Full refund system for non-winning bidders
+  - Bid history tracking with timestamps
+- **Security Features**:
+  - Emergency ETH recovery function
+  - Protected direct ETH transfers
+  - Comprehensive input validation
 
-## Contract Details
+## Contract Structure
 
 ### State Variables
-- `owner`: Contract creator address
-- `highestBidder`: Current highest bidder address
+- `owner`: Contract owner address
+- `highestBidder`: Current highest bidder
 - `highestBid`: Current highest bid amount
-- `auctionEndTime`: When the auction ends
-- `auctionEnded`: Auction status flag
-- `bids`: Mapping of bidder addresses to their bid amounts
-- `bidders`: Array of all bidder addresses
+- `auctionEndTime`: Timestamp when auction ends
+- `auctionEnded`: Boolean flag for auction status
 
-### Main Functions
-
-#### placeBid()
+### Bid Struct
 ```solidity
-function placeBid() external payable
+struct Bid {
+    uint256 amount;    // Total bid amount
+    uint256 timestamp; // When bid was last updated
+    bool isActive;     // Whether bid is still active
+}
 ```
-- Places a new bid
-- Requirements:
-  - Auction must be active
-  - Bid must be > 0
-  - Must be 5% higher than current highest bid (if not first bid)
-- Automatically extends auction by 10 minutes if bid is placed in last 10 minutes
-- Emits `NewBid` event
 
-#### endAuction()
-```solidity
-function endAuction() external
-```
-- Ends the auction
-- Requirements:
-  - Only callable by owner
-  - Auction must not be ended
-  - Current time must be past auction end time
-- Distributes funds:
-  - 98% to winner
-  - 2% to owner
-- Emits `AuctionEnded` event
+### Constants
+- `MIN_INCREASE`: 5% minimum bid increase
+- `FEE`: 2% fee on winning bid
+- `EXTENSION`: 10 minutes extension time
+- `EXTENSION_WINDOW`: 10 minutes window for extension
 
-#### getRefund()
-```solidity
-function getRefund() external
-```
-- Allows non-winning bidders to get their deposits back
-- Requirements:
-  - Auction must be ended
-  - Caller must not be the winner
-  - Caller must have a bid to refund
-- Emits `RefundIssued` event
+## Functions
 
-#### getBids()
-```solidity
-function getBids() external view returns (address[] memory, uint256[] memory)
-```
-- Returns arrays of all bidders and their bid amounts
+### Core Functions
+- `constructor(uint256 _durationInMinutes)`: Initializes auction with duration
+- `placeBid()`: Places a new bid (payable)
+- `endAuction()`: Ends auction and distributes funds
+- `getRefund()`: Allows non-winning bidders to get refund
+- `withdrawPartial(uint256 _amount)`: Allows partial withdrawal of excess funds
 
-#### getTimeLeft()
-```solidity
-function getTimeLeft() external view returns (uint256)
-```
-- Returns remaining auction time in seconds
+### View Functions
+- `getBids()`: Returns all bidders and their bid amounts
+- `getTimeLeft()`: Returns remaining auction time
+
+### Emergency Functions
+- `emergencyWithdraw(address payable _to, uint256 _amount)`: Emergency ETH recovery
 
 ## Events
 - `NewBid`: Emitted when a new bid is placed
 - `AuctionEnded`: Emitted when auction ends
-- `RefundIssued`: Emitted when a refund is processed
+- `RefundIssued`: Emitted when refund is processed
+- `PartialWithdrawal`: Emitted when partial withdrawal occurs
+- `EmergencyWithdrawal`: Emitted when emergency withdrawal occurs
 
-## Testing on Remix
+## Usage
 
-1. Deploy:
-   - Set duration in minutes (e.g., 60 for 1 hour)
-   - Deployer becomes owner
+1. Deploy the contract with desired auction duration
+2. Bidders can place bids using `placeBid()`
+3. Auction automatically extends if bids are placed in last 10 minutes
+4. Owner can end auction after end time
+5. Non-winning bidders can get refunds
+6. Bidders can withdraw excess funds partially
 
-2. Place Bids:
-   - First bid: Any amount > 0
-   - Next bids: Must be 5% higher
-   - Example: 1 ETH → 1.05 ETH → 1.1025 ETH
+## Security Considerations
 
-3. End Auction:
-   - Wait for time to expire
-   - Call `endAuction` as owner
-   - Winner gets 98% of highest bid
-   - Owner gets 2% fee
+- All external functions include input validation
+- Protected against direct ETH transfers
+- Emergency withdrawal function for contract owner
+- Bid tracking with timestamps for audit trail
+- Active status tracking for refunded bids
 
-4. Get Refunds:
-   - Non-winners can call `getRefund`
-   - Winner cannot get refund 
+## Gas Optimization
+
+- Uses constants for magic numbers
+- Optimized storage reads
+- Efficient loop implementations
+- Early require statements
+- Single calculation of derived values
+
+## License
+
+MIT License 
