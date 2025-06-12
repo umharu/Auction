@@ -1,5 +1,8 @@
 # Smart Contract Auction System
 
+Contract Address: `0xdd29E94B0e72cE80D49B8D80D78C26aA041a7AD6`
+Verified at: [Sepolia Etherscan](https://sepolia.etherscan.io/address/0xdd29E94B0e72cE80D49B8D80D78C26aA041a7AD6)
+
 A secure and efficient auction system implemented as a Solidity smart contract. This system provides a transparent and automated way to conduct auctions with automatic time extensions and bid management.
 
 ## Features
