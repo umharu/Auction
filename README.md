@@ -1,7 +1,7 @@
 # Smart Contract Auction System
 
-Contract Address: `0xdd29E94B0e72cE80D49B8D80D78C26aA041a7AD6`
-Verified at: [Sepolia Etherscan](https://sepolia.etherscan.io/address/0xdd29E94B0e72cE80D49B8D80D78C26aA041a7AD6)
+Contract Address: `0xaF4ECFA27Fbfa25594Bcd7E43CF4e0Ab46F44ed4`
+Verified at: [Sepolia Etherscan](https://sepolia.etherscan.io/address/0xaF4ECFA27Fbfa25594Bcd7E43CF4e0Ab46F44ed4)
 
 A secure and efficient auction system implemented as a Solidity smart contract. This system provides a transparent and automated way to conduct auctions with automatic time extensions and bid management.
 
@@ -9,10 +9,11 @@ A secure and efficient auction system implemented as a Solidity smart contract. 
 
 - **Automatic Time Extension**: Auctions automatically extend by 10 minutes if a bid is placed in the last 10 minutes
 - **Minimum Bid Increase**: Requires bids to be at least 5% higher than the current highest bid
-- **Fee System**: Implements a 2% fee on winning bids
+- **Fee System**: Implements a 2% fee on winning bids and refunds
 - **Bid Management**:
   - Partial withdrawal capability for excess funds
   - Full refund system for non-winning bidders
+  - Batch refund functionality for all users
   - Bid history tracking with timestamps
 - **Security Features**:
   - Emergency ETH recovery function
@@ -51,6 +52,7 @@ struct Bid {
 - `endAuction()`: Ends auction and distributes funds
 - `getRefund()`: Allows non-winning bidders to get refund
 - `withdrawPartial(uint256 _amount)`: Allows partial withdrawal of excess funds
+- `refundAllUsers()`: Refunds all non-winning bidders with 2% fee
 
 ### View Functions
 - `getBids()`: Returns all bidders and their bid amounts

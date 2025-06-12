@@ -11,6 +11,7 @@ pragma solidity ^0.8.0;
  * - Refund system for non-winning bidders
  * - Partial withdrawal capability
  * - Emergency ETH recovery
+ * - Batch refund functionality
  */
 contract Auction {
     // Structs
@@ -188,6 +189,55 @@ contract Auction {
         
         _to.transfer(_amount);
         emit EmergencyWithdrawal(_to, _amount);
+    }
+    
+    /**
+     * @dev Refunds all users except the winner, retaining 2% fee
+     * @notice Only callable by owner after auction has ended
+     * @notice Each user receives 98% of their original deposit
+     */
+    function refundAllUsers() external {
+        require(msg.sender == owner, "Not owner");
+        require(auctionEnded, "Auction not ended");
+        
+        uint256 totalRefunded = 0;
+        uint256 totalFees = 0;
+        
+        // Use dirty variable for gas optimization
+        uint256 i;
+        for (i = 0; i < bidders.length; i++) {
+            address bidder = bidders[i];
+            
+            // Skip winner and already refunded bids
+            if (bidder == highestBidder || !bids[bidder].isActive) {
+                continue;
+            }
+            
+            uint256 bidAmount = bids[bidder].amount;
+            if (bidAmount > 0) {
+                // Calculate refund amount (98%) and fee (2%)
+                uint256 refundAmount = (bidAmount * 98) / 100;
+                uint256 fee = bidAmount - refundAmount;
+                
+                // Update bid status
+                bids[bidder].amount = 0;
+                bids[bidder].isActive = false;
+                
+                // Transfer refund to bidder
+                payable(bidder).transfer(refundAmount);
+                
+                // Update totals
+                totalRefunded += refundAmount;
+                totalFees += fee;
+                
+                emit RefundIssued(bidder, refundAmount);
+            }
+        }
+        
+        // Transfer all collected fees to owner
+        if (totalFees > 0) {
+            payable(owner).transfer(totalFees);
+        }
     }
     
     /**
